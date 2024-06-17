@@ -116,8 +116,8 @@ def generate_player_stats(player, away_com, home_com, x, home_score, away_score,
     fgpct = (fgm/fga)
   minutes_played = np.clip(minutes_played, 0, 100)
   ftm = points - (twopt_made*2) - (threept_made*3);
-  extra_ft = random.randint(1, 3);
-  ftm = ftm + extra_ft
+  extra_ft =  round(random.uniform(0, off_rating/10))
+  ftm += extra_ft
   fta = ftm + random.randint(0, 4)
 
 
@@ -163,7 +163,7 @@ def generate_player_stats(player, away_com, home_com, x, home_score, away_score,
 
 
   return {
-    'playerID': player['id'],
+    'id': player['id'],
     'name' : player['name'],
     "minutes_played": minutes_played,
     'points': points,
