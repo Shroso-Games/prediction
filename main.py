@@ -51,6 +51,7 @@ def generate_player_stats(player, away_com, home_com, x, home_score, away_score,
     twopt_made = 0
   else:
     threept_made = random.randint(0, int(points/3))
+    threept_att = threept_made + random.randint(3, 6)
     twopt_made = math.ceil((points-(threept_made*3))/2)
     fgm = threept_made+twopt_made
     if off_rating < 75:
@@ -59,6 +60,11 @@ def generate_player_stats(player, away_com, home_com, x, home_score, away_score,
       fga = fgm + 7
     fgpct = (fgm/fga)
   minutes_played = np.clip(minutes_played, 0, 100)
+  ftm = points - (twopt_made*2) - (threept_made*3);
+  extra_ft = random.randint(1, 3);
+  ftm = ftm + extra_ft
+  fta = ftm + random.randint(0, 4)
+
 
   if points < 0:
     points = 0
@@ -68,15 +74,26 @@ def generate_player_stats(player, away_com, home_com, x, home_score, away_score,
     extra_points = random.randint(5, 15)
     points += extra_points
     assists += random.randint(1, 4)
+    fta = ftm + random.randint(0, 2)
+    threept_att = threept_made + random.randint(0, 4)
+
   if def_rating > 89:
     extra_ast = random.randint(1, 5)
     assists += extra_ast
     rebounds += random.randint(1, 5)
+  if off_rating < 70:
+    fta = ftm + random.randint(1, 4)
+    threept_att = threept_made + random.randint(2, 8)
+
+
+  if fta != 0 and threept_att != 0:
+    three_pct = round(threept_made / threept_att, 2) * 100
+    ft_pct = round(ftm / fta, 2) * 100
   
   if x == 1:
-    home_score += extra_points
+    home_score += extra_points + extra_ft
   else:
-    away_score += extra_points
+    away_score += extra_points + extra_ft
 
   
   return {
@@ -91,7 +108,12 @@ def generate_player_stats(player, away_com, home_com, x, home_score, away_score,
     'fgm': fgm,
     'fgpct': round((fgpct*100), 2),
     '3pt_made': threept_made,
-    'position': player['position']
+    '3pt_att': threept_att,
+    '3pt_pct': three_pct,
+    'fta': fta,
+    'ftm': ftm,
+    'ftpct': ft_pct
+
   }
     
 
