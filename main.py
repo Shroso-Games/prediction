@@ -13,6 +13,9 @@ def generate_player_stats(player, away_com, home_com, x, home_score, away_score,
                           home_team, away_team):
   global total_minutes
   off_rating = player['offRating']
+  three_pct = 0
+  fgpct = 0
+  ft_pct = 0
   def_rating = player['defRating']
   total_off_rating_home = sum(p['offRating'] for p in home_team['players'])
   total_off_rating_away = sum(p['offRating'] for p in away_team['players'])
@@ -22,7 +25,6 @@ def generate_player_stats(player, away_com, home_com, x, home_score, away_score,
   random_variation = random.randint(-10, 4)
   random_steals  = random.randint(-7, 7)
   random_blocks = random.randint(-5, 5)
-  random_turnovers = random.randint(-3, 3)
 
   if x == 1:   
     combined = off_rating + def_rating
@@ -52,10 +54,14 @@ def generate_player_stats(player, away_com, home_com, x, home_score, away_score,
       }
     points = round(home_score * (off_rating/total_off_rating_home))
     rebounds = round((50+random_variation) * (def_rating/total_def_home))
+    off_reb = round(random.randint(0, rebounds) + ((off_rating/100)-3))
+    if off_reb < 0:
+      off_reb = 0
+    def_reb = rebounds - off_reb
     assists = round((26+random_variation) * (off_rating/total_off_rating_home))
     steals = round((7+random_steals) * (def_rating/total_def_home))
     blocks = round((5+random_blocks) * (def_rating/total_def_home))
-    turnovers = round((13+random_turnovers) * (total_def_away/total_off_rating_home) * (off_rating/total_off_rating_home))
+    turnovers = round(13 * (off_rating/total_off_rating_home) * (minutes_played/total_minutes)*10)
   else: 
     combined = off_rating + def_rating
     normalized = combined / away_com
@@ -83,12 +89,15 @@ def generate_player_stats(player, away_com, home_com, x, home_score, away_score,
       }
     points = round(away_score * (off_rating/total_off_rating_away))
     rebounds = round((50+random_variation) * (def_rating/total_def_away))
+    off_reb = round(random.randint(0, rebounds) + ((off_rating/100)-3))
+    if off_reb < 0:
+      off_reb = 0
+    def_reb = rebounds - off_reb
     assists = round((26+random_variation) * (off_rating/total_off_rating_away))
     steals = round((7+random_steals) * (def_rating/total_def_away) * (minutes_played/240) * 10)
     blocks = round((5+random_blocks) * (def_rating/total_def_away) * (minutes_played/240) * 10)
-    turnovers = round((13+random_turnovers) * (total_def_home/total_off_rating_away) * (off_rating/total_off_rating_away))
-
-
+    turnovers = round((13) * (off_rating/total_off_rating_away) * (minutes_played/total_minutes) * 10)
+    print(minutes_played/total_minutes)
   fga = round((off_rating * minutes_played) / 100)
   if fga == 0:
     fgm = 0
@@ -121,6 +130,7 @@ def generate_player_stats(player, away_com, home_com, x, home_score, away_score,
     points += extra_points
     assists += random.randint(1, 4)
     fta = ftm + random.randint(0, 2)
+    turnovers -= 2
     threept_att = threept_made + random.randint(0, 4)
 
   if def_rating > 89:
@@ -142,11 +152,24 @@ def generate_player_stats(player, away_com, home_com, x, home_score, away_score,
     away_score += extra_points + extra_ft
 
   
+
+  if three_pct:
+    three_pct = three_pct
+  else:
+    three_pct = 0
+
+
+
+
+
   return {
+    'playerID': player['id'],
     'name' : player['name'],
     "minutes_played": minutes_played,
     'points': points,
     'rebounds': rebounds,
+    'off_reb': off_reb,
+    'def_reb': def_reb,
     'assists': assists,
     'steals': steals,
     'blocks': blocks,
