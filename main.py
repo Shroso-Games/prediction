@@ -201,7 +201,6 @@ def generate_team_score(team, base_score=70, max_score=120, random_factor=30):
 def predict():
   data = request.get_json();
   
-  whoami = data['my_team']
   home_team = data['home_team']
   away_team = data['away_team']
 
@@ -225,13 +224,7 @@ def predict():
 
   home_player_stats = [generate_player_stats(player, combined_away, combined_home, 1, home_score, away_score, home_team, away_team) for player in home_team['players']]
   away_player_stats = [generate_player_stats(player, combined_away, combined_home, 0, home_score, away_score, home_team, away_team) for player in away_team['players']]
-  
-  if whoami == 1 and home_score > away_score:
-    who_won = 1
-  elif whoami == 0 and away_score > home_score:
-    who_won = 1
-  else:
-    who_won = 0
+
     
   
   
@@ -244,9 +237,7 @@ def predict():
       "away_team": {
         "stats":away_player_stats,
         'score': away_score
-      },
-      "who_won": who_won,
-      "whoami": whoami,
+      }
   }
 
 
