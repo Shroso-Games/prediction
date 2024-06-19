@@ -227,8 +227,7 @@ def predict():
 
     
   
-  
-  time.sleep(3)
+  time.sleep(1)
   return {
       "home_team":{
         "stats": home_player_stats,
